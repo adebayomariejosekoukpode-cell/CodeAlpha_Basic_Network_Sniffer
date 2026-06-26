@@ -37,36 +37,36 @@ def analyze_packet(packet):
         "dns_query": None,
         "flags": None,
     }
-    if packet.hasmlayer(Ether):
+    if Ether in packet:
         info["mac_src"]= packet[Ether].src
         info["mac_dst"]= packet[Ether].dst
         
-    if packet.haslayer(IP):
+    if IP in packet:
         info["ip_src"]= packet[IP].src
         info["ip_dst"]= packet[IP].dst
         info["ttl"]= packet[IP].ttl
         info["protocol"]= PROTOCOLS.get(packet[IP].proto, str(packet[IP].proto))
     
-    if packet.haslayer(TCP):
+    if TCP in packet:
         info["port_src"]= packet[TCP].sport
         info["port_dst"]= packet[TCP].dport
         info["flags"]= packet[TCP].flags
         info["service"]= PORTS_SERVICES.get(packet[TCP].dport, PORTS_SERVICES.get(packet[TCP].sport, 'Inconnu'))
     
-    if packet.haslayer(UDP):
+    if UDP in packet:
         info["port_src"]= packet[UDP].sport
         info["port_dst"]= packet[UDP].dport
         info["service"]= PORTS_SERVICES.get(packet[UDP].dport, PORTS_SERVICES.get(packet[UDP].sport, 'Inconnu'))
 
-    if packet.haslayer(ICMP):
+    if ICMP in packet:
         info["service"]= "ICMP Type" + str(packet[ICMP].type) + " Code " + str(packet[ICMP].code)
         info["protocol"]= "ICMP"
     
-    if packet.haslayer(DNS):
+    if DNS in packet:
         if packet[DNS].qd:
             info["dns_query"]= packet[DNS].qd.qname.decode('utf-8')
             info["service"]= "DNS"
     
-    if packet.haslayer(Raw):
+    if Raw in packet:
         info["payload"]= str(packet[Raw].load[:50])
 
