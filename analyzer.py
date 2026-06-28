@@ -3,6 +3,7 @@ from datetime import datetime
 
 PROTOCOLS = {
     1: 'ICMP',
+    2:'IGMP',
     6: 'TCP',
     17: 'UDP',
 }
@@ -67,6 +68,8 @@ def analyze_packet(packet):
             info["dns_query"]= packet[DNS].qd.qname.decode('utf-8')
             info["service"]= "DNS"
     
-    if Raw in packet:
+    if Raw in packet: 
         info["payload"]= str(packet[Raw].load[:50])
+    
+    return info
 

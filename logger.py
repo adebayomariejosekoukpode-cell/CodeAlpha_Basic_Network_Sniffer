@@ -35,5 +35,5 @@ class Logger:
                 f.write("Payload (first 50 bytes): {}\n".format(info["payload"]))
             f.write("="*60 + "\n\n")
 
-    def get_log_file(self, name):
+    def get_log_file(self):
         return self.log_file

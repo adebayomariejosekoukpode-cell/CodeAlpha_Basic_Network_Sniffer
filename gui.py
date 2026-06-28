@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from sniffer import Sniffer, get_interfaces
+from analyzer import analyze_packet, PORTS_SERVICES
 
 class App:
     def __init__(self, root):
@@ -107,7 +108,7 @@ class App:
         self.sniffer.start()
         if logging:
             self.log_label.config(
-                text="Log: " +self.sniffer.logger.get_log_file(),
+                text="Log: " + self.sniffer.logger.get_log_file(),
                 fg="green"
             )
 
@@ -128,6 +129,10 @@ class App:
         self.root.after(0, lambda: self._insert_row(info))
 
     def _insert_row(self, info):
+
+        port_src = PORTS_SERVICES.get(info["port_src"], str(info["port_src"])) if info["port_src"] else "None"
+        port_dst = PORTS_SERVICES.get(info["port_dst"], str(info["port_dst"])) if info["port_dst"] else "None"
+
         self.table.insert(
             "",
             "end",
@@ -136,8 +141,8 @@ class App:
                 info["ip_src"],
                 info["ip_dst"],
                 info["protocol"],
-                info["port_src"],
-                info["port_dst"],
+                port_src,
+                port_dst,
                 info["service"],
             ),
             tags=(info["protocol"],)
@@ -156,16 +161,27 @@ class App:
             item = self.table.item(selected[0])
             values = item["values"]
 
+            port_src=values[4]
+            port_dst=values[5]
+
+            service_src = PORTS_SERVICES.get(int(port_src), str(port_src)) if port_src != "None" else "None"
+            service_dst = PORTS_SERVICES.get(int(port_dst), str(port_dst)) if port_dst != "None" else "None"
+
             details = (
                 "Heure      : {}\n"
                 "IP Source  : {}\n"
                 "IP Dest    : {}\n"
                 "Protocole  : {}\n"
-                "Port Src   : {}\n"
-                "Port Dst   : {}\n"
+                "Port Src   : {} ({})\n"
+                "Port Dst   : {} ({}) \n"
                 "Service    : {}\n"
-            ).format(values[0], values[1], values[2],
-                    values[3], values[4], values[5], values[6])
+            ).format(values[0], 
+                     values[1], 
+                     values[2],
+                     values[3], 
+                     port_src, service_src, 
+                     port_dst, service_dst, 
+                     values[6])
 
             self.detail_text.config(state="normal")
             self.detail_text.delete("1.0", "end")
